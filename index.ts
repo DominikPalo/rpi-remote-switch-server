@@ -4,31 +4,27 @@ import socketIo = require("socket.io");
 import util = require("util");
 
 import Socket = SocketIO.Socket;
-
+import Dispatcher from "./src/Dispatcher";
+import WebManager from "./src/WebManager";
+import HubManager from "./src/HubManager";
 
 const app = express();
 const server = http.createServer(<any>app);
 const io = socketIo(server);
 
-let clientSocket: Socket;
+const dispatcher = new Dispatcher(
+    new HubManager(io),
+    new WebManager(io)
+);
 
-app.use(express.static(__dirname + '/static'));
+const port = process.env.PORT || 3000;
+
+app.use(express.static(__dirname + "/static"));
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + "/index.html");
 });
 
-io.on('connection', (socket: Socket) => {
-    console.log('New connection');
-    clientSocket = socket;
-
-    clientSocket.on("webMessage", (payload) => {
-        console.log("Message received from web: ", payload)
-    });
-});
-
-
-
-server.listen(3000, () => {
-    console.log('Example app listening on port 3000!');
+server.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
 });
