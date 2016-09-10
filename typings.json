@@ -1,7 +1,6 @@
 {
   "name": "rpi-remote-switch-server",
   "dependencies": {
-    "body-parser": "registry:npm/body-parser#1.15.2+20160815132839",
     "express": "registry:npm/express#4.14.0+20160815112707"
   },
   "globalDependencies": {

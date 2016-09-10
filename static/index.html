@@ -11,10 +11,13 @@
     <input type="checkbox" title="C">
     <input type="checkbox" title="D">
 
-
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+        var socket = io();
+
         $(":checkbox").change(function() {
-            $.post("/", {
+            console.log("Emitting")
+            socket.emit("webMessage", {
                 "relay": this.title,
                 "state": this.checked
             });
