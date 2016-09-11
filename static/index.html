@@ -6,25 +6,25 @@
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 </head>
 <body>
-    <input type="checkbox" title="A">
-    <input type="checkbox" title="B">
-    <input type="checkbox" title="C">
-    <input type="checkbox" title="D">
+    <input type="checkbox" title="1">
+    <input type="checkbox" title="2">
+    <input type="checkbox" title="3">
+    <input type="checkbox" title="4">
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
     <script>
-        var socket = io("/web");
+        var socket = io("http://127.0.0.1:3000/d7403172-f847-448a-9b4c-c6e50f5dcd2e");
 
-        socket.emit("connectToHub", "myKey", function(response) {
-           alert(response);
+        socket.emit("getDevices", function (data) {
+           console.log(data);
+        });
+
+        socket.on("alert", function (data) {
+           alert(data);
         });
 
         $(":checkbox").change(function() {
-            console.log("Emitting")
-            socket.emit("webMessage", {
-                "relay": this.title,
-                "state": this.checked
-            });
+            socket.emit("relay.switchOn", Number(this.title));
 
         });
     </script>

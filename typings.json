@@ -1,8 +1,6 @@
 {
   "name": "rpi-remote-switch-server",
-  "dependencies": {
-    "express": "registry:npm/express#4.14.0+20160815112707"
-  },
+  "dependencies": {},
   "globalDependencies": {
     "node": "registry:dt/node#6.0.0+20160831021119",
     "socket.io": "registry:dt/socket.io#1.4.4+20160317120654"

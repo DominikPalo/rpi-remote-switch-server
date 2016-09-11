@@ -1,22 +1,47 @@
 import Namespace = SocketIO.Namespace;
 import Server = SocketIO.Server;
 import Socket = SocketIO.Socket;
-import WebManager from "./WebManager";
-import Hub from "./Hub";
 
 export default class HubManager {
-    public webManager: WebManager;
-    private io: Namespace;
-    private connectedHubs: ConnectedHubs;
+    constructor(private ioServer: Server) {
+        this.ioServer.use(require('socketio-wildcard')());
 
-    constructor(ioServer: Server) {
-        this.io = ioServer.of("/hub");
-        this.connectedHubs = {};
+        this.ioServer.on("connection", (socket: Socket) => {
+            console.log("New hub connected: " + socket.id);
+
+            socket.on("register", (id: string, callback: Function) => {
+                if (!id || id === "") {
+                    return callback(null);
+                }
+
+                callback(this.registerHub(id, socket));
+            });
+        });
     }
 
-    public getHubData(key: string): Hub {
-        return this.connectedHubs[key];
+    private registerHub(id: string, hubPrivateSocket: Socket): string {
+        const publicAddress = `/${id}`;
+
+        console.log(`Hub registered to address /hubs/${id}`);
+
+        const hubPublicIo = this.ioServer.of(publicAddress);
+
+        hubPublicIo.use(require('socketio-wildcard')());
+
+        hubPublicIo.on("connection", (socket) => {
+            console.log("new peer connected: " + socket.id);
+
+            // Route all messages from client to hub
+            socket.on("*", (event) => {
+                hubPrivateSocket.emit.apply(hubPrivateSocket, event.data);
+            })
+        });
+
+        // Route all messages from hub to all clients
+        hubPrivateSocket.on("*", (event) => {
+            hubPublicIo.emit.apply(hubPublicIo, event.data);
+        });
+
+        return publicAddress;
     }
 }
-
-type ConnectedHubs = { [id: string]: Hub }
