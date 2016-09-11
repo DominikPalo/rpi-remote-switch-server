@@ -10,11 +10,12 @@ export default class HubManager {
             console.log("New hub connected: " + socket.id);
 
             socket.on("register", (id: string, callback: Function) => {
-                if (!id || id === "") {
-                    return callback(null);
+                if (this.isUuidV4(id)) {
+                    callback(this.registerHub(id, socket));
                 }
-
-                callback(this.registerHub(id, socket));
+                else {
+                    callback("ID must be valid UUIDv4 string)");
+                }
             });
         });
     }
@@ -22,7 +23,7 @@ export default class HubManager {
     private registerHub(id: string, hubPrivateSocket: Socket): string {
         const publicAddress = `/${id}`;
 
-        console.log(`Hub registered to address /hubs/${id}`);
+        console.log(`Hub registered to address ${publicAddress}`);
 
         const hubPublicIo = this.ioServer.of(publicAddress);
 
@@ -43,5 +44,10 @@ export default class HubManager {
         });
 
         return publicAddress;
+    }
+
+    private isUuidV4(input: string): boolean {
+        const pattern = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+        return (typeof input === 'string') && pattern.test(input);
     }
 }
